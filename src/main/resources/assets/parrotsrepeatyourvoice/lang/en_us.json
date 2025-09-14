@@ -3,5 +3,7 @@
 
   "parrotsrepeatyourvoice.configuration.title": "Parrots Repeat Your Voice Configs",
   "parrotsrepeatyourvoice.configuration.section.parrotsrepeatyourvoice.common.toml": "Parrots Repeat Your Voice Configs",
-  "parrotsrepeatyourvoice.configuration.section.parrotsrepeatyourvoice.common.toml.title": "Parrots Repeat Your Voice Configs"
+  "parrotsrepeatyourvoice.configuration.section.parrotsrepeatyourvoice.common.toml.title": "Parrots Repeat Your Voice Configs",
+  "parrotsrepeatyourvoice.configuration.maxSavedRecordings": "Maximum Saved Recordings",
+  "parrotsrepeatyourvoice.configuration.maxSavedRecordings.tooltip": "The maximum amount of player recordings that can be saved"
 }

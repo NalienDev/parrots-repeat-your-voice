@@ -2,7 +2,9 @@
   "required": true,
   "package": "dev.omialien.parrotsrepeatyourvoice.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "ParrotMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

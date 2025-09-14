@@ -18,7 +18,24 @@ version = mod_version
 group = mod_group_id
 
 repositories {
-    // Add here additional repositories if required by some of the dependencies below.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven { url = 'https://maven.maxhenkel.de/repository/public' }
+    maven {
+        url 'https://maven.blamejared.com/'
+    }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 base {

@@ -1,13 +1,7 @@
 {
   "itemGroup.parrotsrepeatyourvoice": "Example Mod Tab",
-  "block.parrotsrepeatyourvoice.example_block": "Example Block",
-  "item.parrotsrepeatyourvoice.example_item": "Example Item",
 
   "parrotsrepeatyourvoice.configuration.title": "Parrots Repeat Your Voice Configs",
   "parrotsrepeatyourvoice.configuration.section.parrotsrepeatyourvoice.common.toml": "Parrots Repeat Your Voice Configs",
-  "parrotsrepeatyourvoice.configuration.section.parrotsrepeatyourvoice.common.toml.title": "Parrots Repeat Your Voice Configs",
-  "parrotsrepeatyourvoice.configuration.items": "Item List",
-  "parrotsrepeatyourvoice.configuration.logDirtBlock": "Log Dirt Block",
-  "parrotsrepeatyourvoice.configuration.magicNumberIntroduction": "Magic Number Text",
-  "parrotsrepeatyourvoice.configuration.magicNumber": "Magic Number"
+  "parrotsrepeatyourvoice.configuration.section.parrotsrepeatyourvoice.common.toml.title": "Parrots Repeat Your Voice Configs"
 }

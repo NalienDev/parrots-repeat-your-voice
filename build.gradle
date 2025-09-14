@@ -133,6 +133,9 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    runtimeOnly ("maven.modrinth:simple-voice-chat:${voicechat_dependency}")
+    implementation ("blank:voice-chat-recording:1.21.1-${voicechatrecording_version}")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -148,7 +151,9 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_license            : mod_license,
             mod_version            : mod_version,
             mod_authors            : mod_authors,
-            mod_description        : mod_description
+            mod_description        : mod_description,
+            voicechat_dependency   : voicechat_dependency,
+            voicechatrecording_version: voicechatrecording_version
     ]
     inputs.properties replaceProperties
     expand replaceProperties

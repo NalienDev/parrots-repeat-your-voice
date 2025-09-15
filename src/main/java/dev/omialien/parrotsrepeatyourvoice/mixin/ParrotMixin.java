@@ -3,6 +3,7 @@ package dev.omialien.parrotsrepeatyourvoice.mixin;
 import dev.omialien.parrotsrepeatyourvoice.ParrotsRepeatYourVoice;
 import dev.omialien.parrotsrepeatyourvoice.entity.ParrotAudioStorage;
 import dev.omialien.parrotsrepeatyourvoice.entity.goals.ParrotRandomRepeatGoal;
+import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Parrot;
@@ -19,7 +20,7 @@ import java.util.*;
 public class ParrotMixin extends Mob implements ParrotAudioStorage {
 
     @Unique
-    private Set<UUID> parrotsrepeatyourvoice$savedAudios = new HashSet<>();
+    private final Set<UUID> parrotsrepeatyourvoice$savedAudios = new HashSet<>();
 
     protected ParrotMixin(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -55,5 +56,11 @@ public class ParrotMixin extends Mob implements ParrotAudioStorage {
                         new Random().nextInt(parrotsrepeatyourvoice$savedAudios.size())
                 )
         );
+    }
+
+    @Override
+    public RecordedAudio parrotsrepeatyourvoice$getRandomAudio() {
+        UUID randomUuid = parrotsrepeatyourvoice$savedAudios.stream().toList().get(new Random().nextInt(parrotsrepeatyourvoice$savedAudios.size()));
+        return ParrotsRepeatYourVoice.AUDIOS.getAudio(randomUuid);
     }
 }

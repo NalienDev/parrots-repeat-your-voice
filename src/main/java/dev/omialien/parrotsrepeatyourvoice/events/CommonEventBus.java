@@ -4,6 +4,7 @@ import dev.omialien.parrotsrepeatyourvoice.ParrotsRepeatYourVoice;
 import dev.omialien.parrotsrepeatyourvoice.config.ParrotsRepeatYourVoiceServerConfigs;
 import dev.omialien.parrotsrepeatyourvoice.entity.ParrotAudioStorage;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
+import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.events.AudioLoadedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.AudioRecordedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
@@ -13,7 +14,7 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Parrot;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 import java.util.List;
@@ -27,12 +28,13 @@ public class CommonEventBus {
     }
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event){
-        // save all the audios
+        ParrotsRepeatYourVoice.AUDIOS.saveAllAudios();
     }
 
     @SubscribeEvent
-    public static void onServerStarting(ServerStartingEvent event){
-        // load all the audios
+    public static void onServerStarted(ServerStartedEvent event){
+        VoiceChatRecordingPlugin.addCategory("yappingparrots", "Yapping Parrots", "The volume of all yapping parrots", null);
+        ParrotsRepeatYourVoice.AUDIOS.loadAllAudios();
     }
 
     @SubscribeEvent
@@ -42,7 +44,7 @@ public class CommonEventBus {
             if (parrots == null || parrots.isEmpty()) {
                 return;
             }
-
+            ParrotsRepeatYourVoice.AUDIOS.addAudio(event.getAudio());
             parrots.forEach(parrot -> {
                 ParrotAudioStorage parrotAudioStorage = (ParrotAudioStorage) parrot;
                 if (parrotAudioStorage.parrotsrepeatyourvoice$getSavedAudios().size() >= ParrotsRepeatYourVoiceServerConfigs.RECORDING_LIMIT.get()){
@@ -51,11 +53,13 @@ public class CommonEventBus {
                 parrotAudioStorage.parrotsrepeatyourvoice$addSavedAudio(event.getAudio().getId());
                 ParrotsRepeatYourVoice.LOGGER.debug("Audio recorded and stored!");
             });
+
         }
     }
 
     @SubscribeEvent
     private static void onAudioLoadedEvent(AudioLoadedEvent event){
+        ParrotsRepeatYourVoice.AUDIOS.addAudio(event.getAudio());
         // load the audios to the entities that learned them
     }
 

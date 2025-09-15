@@ -3,85 +3,41 @@ package dev.omialien.parrotsrepeatyourvoice.voicechat;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 public class AudioStorage {
     public static final int SAMPLE_RATE = 48000;
     private final Random rnd;
-    private final Map<UUID, List<RecordedAudio>> storedAudios;
+    private final Set<RecordedAudio> storedAudios;
 
     public AudioStorage(){
         rnd = new Random();
-        storedAudios = new ConcurrentHashMap<>();
+        storedAudios = new HashSet<>();
     }
 
     public int getTotalAudioCount(){
-        return storedAudios.values().stream().mapToInt(List::size).sum();
+        return storedAudios.size();
     }
 
     public void addAudio(RecordedAudio audio){
-        if(!storedAudios.containsKey(audio.getPlayerUUID())){
-            storedAudios.put(audio.getPlayerUUID(), new LinkedList<>());
-        }
-        storedAudios.get(audio.getPlayerUUID()).add(audio);
+        storedAudios.add(audio);
     }
 
-    public RecordedAudio getRandomAudio(UUID player, boolean remove){
-        List<RecordedAudio> recs = storedAudios.get(player);
-        if(recs == null || recs.isEmpty()) { return null; }
-        int idx = rnd.nextInt(recs.size());
-        RecordedAudio audio = recs.get(idx);
-        if(remove){
-            recs.remove(audio);
-        }
-        return audio;
+    public void removeAudio(UUID audioId){
+        storedAudios.stream().filter(a -> a.getId().equals(audioId)).findFirst().ifPresent(storedAudios::remove);
     }
 
-    public RecordedAudio getRandomAudio(Predicate<UUID> includePlayer, boolean remove){
-        List<RecordedAudio> total = new LinkedList<>();
-        storedAudios.keySet().stream().filter(includePlayer).forEach((uuid) -> {
-            total.addAll(storedAudios.get(uuid));
-        });
-        if(total.isEmpty()){ return null; }
-        int randomIndex = rnd.nextInt(total.size());
-        RecordedAudio randomAudio = total.get(randomIndex);
-        if(remove){
-            storedAudios.get(randomAudio.getPlayerUUID()).remove(randomAudio);
-        }
-        return randomAudio;
+    public RecordedAudio getAudio(UUID audioId){
+        return storedAudios.stream().filter(a -> a.getId().equals(audioId)).findFirst().orElse(null);
     }
 
-    public RecordedAudio getRandomAudio(boolean remove){
-        List<RecordedAudio> total = storedAudios.values().stream().flatMap(Collection::stream).toList();
-        if(total.isEmpty()){ return null; }
-        int randomIndex = rnd.nextInt(total.size());
-        RecordedAudio randomAudio = total.get(randomIndex);
-        if (remove) {
-            storedAudios.get(randomAudio.getPlayerUUID()).remove(randomAudio);
-        }
-        return randomAudio;
+    public void saveAllAudios() {
+        storedAudios.forEach((RecordedAudio::saveAudio));
     }
-
-    public void removeRandomAudio(){
-        List<RecordedAudio> total = storedAudios.values().stream().flatMap(Collection::stream).toList();
-        if(total.isEmpty()){ return; }
-        RecordedAudio toRemove = total.get(rnd.nextInt(total.size()));
-        storedAudios.get(toRemove.getPlayerUUID()).remove(toRemove);
-    }
-
-    public void savePlayerAudios(UUID uuid) {
-        List<RecordedAudio> recs = storedAudios.get(uuid);
-        if(recs != null && !recs.isEmpty()){
-            recs.forEach(audio -> {
-                if (audio.wasSaved()) return;
-                audio.saveAudio();
-            });
-        }
-    }
-
-    public void loadPlayerAudios(UUID uuid) {
-        VoiceChatRecordingPlugin.loadPlayerAudios(uuid);
+    public void loadAllAudios() {
+        VoiceChatRecordingPlugin.loadAllAudios();
     }
 }

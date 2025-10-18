@@ -1,13 +1,13 @@
 package dev.omialien.parrotsrepeatyourvoice.events;
 
+import com.mojang.datafixers.util.Pair;
 import dev.omialien.parrotsrepeatyourvoice.ParrotsRepeatYourVoice;
 import dev.omialien.parrotsrepeatyourvoice.config.ParrotsRepeatYourVoiceServerConfigs;
-import dev.omialien.parrotsrepeatyourvoice.entity.ParrotAudioStorage;
-import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechat_recording.voicechat.events.AudioLoadedEvent;
-import dev.omialien.voicechat_recording.voicechat.events.AudioRecordedEvent;
-import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
+import dev.omialien.parrotsrepeatyourvoice.mixinutil.ParrotAudioStorage;
+import dev.omialien.voicechatrecording.api.IRecordedAudio;
+import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
+import dev.omialien.voicechatrecording.api.events.AudioRecordedEvent;
+import dev.omialien.voicechatrecording.api.events.RecordingSetupEvent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -23,34 +23,42 @@ import java.util.UUID;
 @EventBusSubscriber(modid = ParrotsRepeatYourVoice.MOD_ID)
 public class CommonEventBus {
     @SubscribeEvent
-    public static void onMicrophonePacket(MicPacketReceivedEvent event) {
-        // do something
-    }
-    @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event){
         ParrotsRepeatYourVoice.AUDIOS.saveAllAudios();
     }
 
     @SubscribeEvent
-    public static void onServerStarted(ServerStartedEvent event){
-        VoiceChatRecordingPlugin.addCategory("yappingparrots", "Yapping Parrots", "The volume of all yapping parrots", null);
+    public static void onRecordingSetup(RecordingSetupEvent event) {
+        ParrotsRepeatYourVoice.RECORDING_API = event.getApi();
+        ParrotsRepeatYourVoice.LOGGER.debug("recording setup event");
+        event.addCategory(
+                ParrotsRepeatYourVoice.MOD_ID,
+                "Yapping Parrots",
+                "The volume of all yapping parrots", null
+        );
+        ParrotsRepeatYourVoice.LOGGER.debug("API: {}", ParrotsRepeatYourVoice.RECORDING_API.toString());
         ParrotsRepeatYourVoice.AUDIOS.loadAllAudios();
     }
 
     @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event){
+    }
+
+    @SubscribeEvent
     private static void onAudioRecordedEvent(AudioRecordedEvent event){
-        if(filterAudio(event.getAudio())){
-            List<Parrot> parrots = withinAParrotsRange(event.getAudio().getPlayerUUID());
+        IRecordedAudio audio = event.getAudio();
+        if(audio.getFilterResult() == IRecordedAudio.FilterResult.PASSED){
+            List<Parrot> parrots = withinAParrotsRange(audio.getPlayerUUID());
             if (parrots == null || parrots.isEmpty()) {
                 return;
             }
-            ParrotsRepeatYourVoice.AUDIOS.addAudio(event.getAudio());
+            ParrotsRepeatYourVoice.AUDIOS.addAudio(audio);
             parrots.forEach(parrot -> {
                 ParrotAudioStorage parrotAudioStorage = (ParrotAudioStorage) parrot;
-                if (parrotAudioStorage.parrotsrepeatyourvoice$getSavedAudios().size() >= ParrotsRepeatYourVoiceServerConfigs.RECORDING_LIMIT.get()){
-                    parrotAudioStorage.parrotsrepeatyourvoice$removeRandomAudio();
+                if (parrotAudioStorage.yappingparrots$getSavedAudios().size() >= ParrotsRepeatYourVoiceServerConfigs.RECORDING_LIMIT.get()){
+                    parrotAudioStorage.yappingparrots$removeRandomAudio();
                 }
-                parrotAudioStorage.parrotsrepeatyourvoice$addSavedAudio(event.getAudio().getId());
+                parrotAudioStorage.yappingparrots$addSavedAudio(Pair.of(audio.getPlayerUUID(), audio.getId()));
                 ParrotsRepeatYourVoice.LOGGER.debug("Audio recorded and stored!");
             });
 
@@ -59,21 +67,13 @@ public class CommonEventBus {
 
     @SubscribeEvent
     private static void onAudioLoadedEvent(AudioLoadedEvent event){
-        ParrotsRepeatYourVoice.AUDIOS.addAudio(event.getAudio());
-        // load the audios to the entities that learned them
-    }
-
-    private static boolean filterAudio(RecordedAudio audio) {
-        double duration = audio.getDuration();
-        if (duration <= 0.5) {
-            return false;
-        } else if (duration > 4.0) {
-            return false;
-        } else if (audio.getActiveSamples() <= 0) {
-            return false;
-        } else {
-            return audio.getRms() >= 500.0;
+        // TODO do we really need this? why not load the audios as the parrots that need those audios speak?
+        //  with the audio loading cache, that shouldn't be a problem; just don't block the thread by waiting
+        //  for the audios
+        if(event.getLoadReason() == AudioLoadedEvent.LoadType.NAMESPACE && event.getNamespace().equals(ParrotsRepeatYourVoice.MOD_ID)) {
+            ParrotsRepeatYourVoice.AUDIOS.addAudio(event.getAudio());
         }
+        // load the audios to the entities that learned them
     }
 
     private static List<Parrot> withinAParrotsRange(UUID playerUUID) {

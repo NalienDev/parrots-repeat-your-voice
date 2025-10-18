@@ -1,9 +1,9 @@
 package dev.omialien.parrotsrepeatyourvoice.entity.goals;
 
 import dev.omialien.parrotsrepeatyourvoice.ParrotsRepeatYourVoice;
-import dev.omialien.parrotsrepeatyourvoice.entity.ParrotAudioStorage;
-import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
-import dev.omialien.voicechat_recording.voicechat.util.AudioPlayingUtil;
+import dev.omialien.parrotsrepeatyourvoice.mixinutil.ParrotAudioStorage;
+import dev.omialien.voicechatrecording.api.IRecordedAudio;
+import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.animal.Parrot;
 
@@ -18,8 +18,7 @@ public class ParrotRandomRepeatGoal extends Goal {
     @Override
     public boolean canUse() {
         parrotAudioStorage = (ParrotAudioStorage) parrot;
-
-        return !parrotAudioStorage.parrotsrepeatyourvoice$getSavedAudios().isEmpty() && !isInCooldown();
+        return !parrotAudioStorage.yappingparrots$getSavedAudios().isEmpty() && !isInCooldown();
     }
 
     private boolean isInCooldown(){
@@ -29,8 +28,9 @@ public class ParrotRandomRepeatGoal extends Goal {
     @Override
     public void start() {
         ParrotsRepeatYourVoice.LOGGER.info("Started Goal!");
-        RecordedAudio audio = parrotAudioStorage.parrotsrepeatyourvoice$getRandomAudio();
+        IRecordedAudio audio = ParrotsRepeatYourVoice.AUDIOS.getAudio(parrotAudioStorage.yappingparrots$getRandomAudio());
         if (audio != null) {
+            ParrotsRepeatYourVoice.LOGGER.info("Started Goal! {}", audio.getDuration());
             AudioPlayingUtil.playFromEntity(audio, parrot, ParrotsRepeatYourVoice.MOD_ID);
             inCooldown = true;
         }

@@ -22,6 +22,9 @@ public class ParrotDataComponents {
         public Pair<UUID, UUID> asPair() {
             return Pair.of(playerId(), audioId());
         }
+        public static ParrotAudio fromPair(Pair<UUID, UUID> id) {
+            return new ParrotAudio(id.getFirst(), id.getSecond());
+        }
     }
 
     private static final Codec<ParrotAudio> PARROT_AUDIO_CODEC = RecordCodecBuilder.create(

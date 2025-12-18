@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat_seeds"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "result": {
+    "components": {
+      "minecraft:item_name": "\"Sweet Seeds\"",
+      "minecraft:lore": [
+        "{\"color\":\"green\",\"text\":\"Feed this to your parrot to make it replay its last audio!\"}"
+      ],
+      "yappingparrots:seed_actions": "FORCEAUDIO"
+    },
+    "count": 1,
+    "id": "minecraft:wheat_seeds"
+  }
+}

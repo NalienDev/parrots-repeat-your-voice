@@ -3,17 +3,22 @@ package dev.omialien.parrotsrepeatyourvoice.events;
 import com.mojang.datafixers.util.Pair;
 import dev.omialien.parrotsrepeatyourvoice.ParrotsRepeatYourVoice;
 import dev.omialien.parrotsrepeatyourvoice.config.ParrotsRepeatYourVoiceServerConfigs;
+import dev.omialien.parrotsrepeatyourvoice.datagen.ParrotsRecipeProvider;
 import dev.omialien.parrotsrepeatyourvoice.mixinutil.ParrotAudioStorage;
+import dev.omialien.parrotsrepeatyourvoice.registry.ParrotDataComponents;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
 import dev.omialien.voicechatrecording.api.events.AudioRecordedEvent;
 import dev.omialien.voicechatrecording.api.events.RecordingSetupEvent;
+import net.minecraft.data.DataProvider;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Parrot;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
@@ -89,4 +94,28 @@ public class CommonEventBus {
         return player.level().getNearbyEntities(Parrot.class, TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(20, 20, 20));
     }
 
+    @SubscribeEvent
+    private static void onFeedParrot(PlayerInteractEvent.EntityInteract event) {
+        if ( event.getTarget() instanceof Parrot parrot ) {
+            // TODO should only tamed parrots be affected?
+            if ( parrot.isTame() ) {
+                if ( parrot.isOwnedBy(event.getEntity())) {
+                    ParrotDataComponents.SeedActions action = event.getItemStack().get(ParrotDataComponents.SEED_ACTIONS.get());
+                    if ( action != null ) {
+                        if ( ((ParrotAudioStorage)parrot).yappingparrots$executeSeedAction(action) ) {
+                            event.getItemStack().consume(1, event.getEntity());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void doDatagen(GatherDataEvent e) {
+        e.getGenerator().addProvider(
+                e.includeServer(),
+                (DataProvider.Factory<ParrotsRecipeProvider>) output -> new ParrotsRecipeProvider(output, e.getLookupProvider())
+        );
+    }
 }

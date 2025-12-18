@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat_seeds"
+    },
+    {
+      "item": "minecraft:carrot"
+    }
+  ],
+  "result": {
+    "components": {
+      "minecraft:item_name": "\"Veggie Seeds\"",
+      "minecraft:lore": [
+        "{\"color\":\"aqua\",\"text\":\"Feed this to your parrot to make it remember its voicelines!\"}"
+      ],
+      "yappingparrots:seed_actions": "REMEMBER"
+    },
+    "count": 1,
+    "id": "minecraft:wheat_seeds"
+  }
+}

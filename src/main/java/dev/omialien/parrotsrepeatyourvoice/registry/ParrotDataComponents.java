@@ -11,6 +11,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -35,7 +36,7 @@ public class ParrotDataComponents {
     );
 
     public static final Supplier<AttachmentType<List<ParrotAudio>>> PARROT_AUDIO_ATTACHMENT = REGISTRY.register(
-            "parrot_audios", () -> AttachmentType.builder(() -> (List<ParrotAudio>)(new ArrayList<ParrotAudio>()))
+            "parrot_audios", () -> AttachmentType.builder(() -> Collections.synchronizedList(new ArrayList<ParrotAudio>()))
                     .serialize(PARROT_AUDIO_CODEC.listOf())
                     .build()
     );

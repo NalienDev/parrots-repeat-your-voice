@@ -11,7 +11,7 @@ public class AudioStorage {
     private final Map<Pair<UUID, UUID>, IRecordedAudio> storedAudios;
 
     public AudioStorage(){
-        storedAudios = new HashMap<>();
+        storedAudios = new LinkedHashMap<>();
     }
 
     public int getTotalAudioCount(){

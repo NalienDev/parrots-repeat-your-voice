@@ -21,7 +21,7 @@ public class ParrotRandomRepeatGoal extends Goal {
     public boolean canUse() {
         ParrotsRepeatYourVoice.LOGGER.debug("checking if canuse: {} vs {}", this.cooldownEndsAt, this.parrot.level().getGameTime());
         parrotAudioStorage = (ParrotAudioStorage) parrot;
-        return !parrotAudioStorage.yappingparrots$getSavedAudios().isEmpty() && !isInCooldown();
+        return parrotAudioStorage.yappingparrots$audioCount() > 0 && !isInCooldown();
     }
 
     private boolean isInCooldown(){

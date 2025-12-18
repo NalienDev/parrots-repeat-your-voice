@@ -55,7 +55,7 @@ public class CommonEventBus {
             ParrotsRepeatYourVoice.AUDIOS.addAudio(audio);
             parrots.forEach(parrot -> {
                 ParrotAudioStorage parrotAudioStorage = (ParrotAudioStorage) parrot;
-                if (parrotAudioStorage.yappingparrots$getSavedAudios().size() >= ParrotsRepeatYourVoiceServerConfigs.RECORDING_LIMIT.get()){
+                if (parrotAudioStorage.yappingparrots$audioCount() >= ParrotsRepeatYourVoiceServerConfigs.RECORDING_LIMIT.get()){
                     parrotAudioStorage.yappingparrots$removeRandomAudio();
                 }
                 parrotAudioStorage.yappingparrots$addSavedAudio(Pair.of(audio.getPlayerUUID(), audio.getId()));

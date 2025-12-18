@@ -44,6 +44,11 @@ public class ParrotMixin extends Mob implements ParrotAudioStorage {
     }
 
     @Override
+    public int yappingparrots$audioCount() {
+        return this.getData(ParrotDataComponents.PARROT_AUDIO_ATTACHMENT.get()).size();
+    }
+
+    @Override
     public List<Pair<UUID, UUID>> yappingparrots$getSavedAudios() {
         return this.getData(ParrotDataComponents.PARROT_AUDIO_ATTACHMENT.get()).stream().map(ParrotDataComponents.ParrotAudio::asPair).toList();
     }
